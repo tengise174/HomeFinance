@@ -29,10 +29,9 @@ var financeController = (function () {
 
 })();
 
+
 // Програмын холбогч контроллер
 var appController = (function (uiController, fnController) {
-
-    var DOM = uiController.getDOMstrings();
 
     var crtlAddItem = function () {
         // 1. Оруулах өгөгдлийг дэлгэцээс олж авна. 
@@ -48,15 +47,29 @@ var appController = (function (uiController, fnController) {
 
     };
 
-    document.querySelector(DOM.addBtn).addEventListener('click', function () {
-        crtlAddItem();
-    });
+    var setupEventListeners = function () {
 
+        var DOM = uiController.getDOMstrings();
 
-    document.addEventListener('keypress', function (event) {
-        if (event.keyCode === 13 || event.which === 13) {
+        document.querySelector(DOM.addBtn).addEventListener('click', function () {
             crtlAddItem();
+        });
+
+
+        document.addEventListener('keypress', function (event) {
+            if (event.keyCode === 13 || event.which === 13) {
+                crtlAddItem();
+            }
+        });
+    };
+
+    return {
+        init: function () {
+            console.log('Application started ...');
+            setupEventListeners();
         }
-    });
+    };
 
 })(uiController, financeController);
+
+appController.init();
