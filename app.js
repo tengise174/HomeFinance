@@ -99,7 +99,18 @@ var financeController = (function () {
         this.id = id;
         this.description = description;
         this.value = value;
+        this.percentage = -1;
     };
+
+    Expense.prototype.calcPercentage = function (totalIncome) {
+        if (totalIncome > 0)
+            this.percentage = Math.round((this.value / totalIncome) * 100);
+        else this.percentage = 0;
+    };
+
+    Expense.prototype.getPercentrage = function () {
+        return this.percentage;
+    }
 
     var calculateTotal = function (type) {
         var sum = 0;
@@ -140,8 +151,24 @@ var financeController = (function () {
             data.tusuv = data.totals.inc - data.totals.exp;
 
             //Орлого зарлагын хувийг тооцоолно
-            data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+            if (data.totals.inc > 0)
+                data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+            else data.huvi = 0;
 
+        },
+
+        calculatePercentages: function () {
+            data.items.exp.forEach(function (el) {
+                el.calcPercentage(data.totals.inc);
+            });
+        },
+
+        getPercentages: function () {
+            var allPercentages = data.items.exp.map(function (el) {
+                return el.getPercentrage();
+            });
+
+            return allPercentages;
         },
 
         tusviigAvah: function () {
@@ -224,6 +251,15 @@ var appController = (function (uiController, financeController) {
 
         //6. Төсвийн тооцоог дэлгэцэнд гаргана. 
         uiController.tusviigUzuuleh(tusuv);
+
+        // 7. Элэментүүдийн хувийг тооцоолно
+        financeController.calculatePercentages();
+
+        // 8. Элементүүдийн хувийг хүлээж авна.
+        var allPercentages = financeController.getPercentages();
+
+        // 9. Эдгээр хувийг дэлгэцэнд харуулна.
+
     };
 
     var setupEventListeners = function () {
